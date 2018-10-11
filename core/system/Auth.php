@@ -42,9 +42,9 @@ class Auth
 
     private $user = NULL;
 
-    public function getCurrentUser(){
+    public function getCurrentUser($clazz = User::class){
         if(!$this->isAuth()) return NULL;
-        if($this->user===NULL) $this->user = User::where("id",Session::instance()->getUserId())->first();
+        if($this->user===NULL) $this->user = call_user_func("{$clazz}::where","id",Session::instance()->getUserId())->first();
         return $this->user;
     }
 }

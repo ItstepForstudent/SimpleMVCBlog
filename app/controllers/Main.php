@@ -16,13 +16,10 @@ class Main extends Controller
 {
     public function action_index()
     {
-
         $v = new View("main");
-
-
         $v->posts = Post::limit(10)->desc("id")->all();
         $v->auth=Auth::instance()->isAuth();
-        $v->user=Auth::instance()->getCurrentUser();
+        $v->user=Auth::instance()->getCurrentUser(User::class);
         $v->categories = Category::all();
         $v->setTemplate();
         echo $v->render();

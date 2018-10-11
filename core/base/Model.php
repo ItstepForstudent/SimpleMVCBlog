@@ -75,7 +75,12 @@ abstract class Model
     {
         return call_user_func("{$class}::where",$key,$this->data[$link_field])->first();
     }
-
+    protected function belongsToMany(string $class, string $midle_table, string $middle_cur_field, string $middle_far_field, string $key="id", string $far_key="id")
+    {
+        return call_user_func("{$class}::join",$midle_table,$middle_far_field,$far_key)
+            ->where("{$midle_table}.{$middle_cur_field}",$this->data[$key])
+            ->fields([call_user_func("{$class}::getTableName").".*"]);
+    }
 
     public function isEmpty(){
         return empty($this->data);

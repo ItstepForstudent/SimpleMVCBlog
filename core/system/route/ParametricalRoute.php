@@ -24,6 +24,7 @@ class ParametricalRoute extends Route
 
     public function compareRoute()
     {
+        if($this->filter!==null && !($this->filter)()) return false;
         $rules = explode("/",$this->getClearRule());
         $paths = explode("/",$this->getClearPath());
 

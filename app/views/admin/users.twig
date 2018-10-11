@@ -1,0 +1,133 @@
+<style>
+    .table{
+        border: 1px solid #333;
+        margin: 20px auto;
+    }
+    .table td{
+        padding: 20px;
+        border: 1px solid #ccc;
+    }
+</style>
+<script>
+    class Ajax{
+        static get(url,onsuccess,onerror){
+            let request = new XMLHttpRequest();
+            request.open("GET",url,true);
+            request.onreadystatechange=function () {
+                if(request.readyState!==4) return;
+                if(request.status===200)
+                    onsuccess(request.responseText);
+                else if(onerror)
+                    onerror(request.status,request.statusText);
+            };
+            request.send();
+        }
+        static post(url,params,onsuccess,onerror){
+            let request = new XMLHttpRequest();
+            request.open("POST",url,true);
+            request.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+            request.onreadystatechange=function () {
+                if(request.readyState!==4) return;
+                if(request.status===200)
+                    onsuccess(request.responseText);
+                else if(onerror)
+                    onerror(request.status,request.statusText);
+            };
+            let _params = [];
+            for(let i in params) _params.push(i+"="+encodeURIComponent(params[i]));
+            request.send(_params.join("&"));
+        }
+        static postMultiPart(url,params,onsuccess,onerror){
+            let request = new XMLHttpRequest();
+            request.open("POST",url,true);
+            request.onreadystatechange=function () {
+                if(request.readyState!==4) return;
+                if(request.status===200)
+                    onsuccess(request.responseText);
+                else if(onerror)
+                    onerror(request.status,request.statusText);
+            };
+            request.send(params);
+        }
+    }
+
+    document.addEventListener("dblclick",function(e){
+        if(!e.target.matches(".editable")) return;
+        let _this = e.target;
+        _this.dataset.value = _this.innerText;
+        if(_this.dataset.name == 'login') editLogin(_this);
+    });
+
+    function editLogin(_this) {
+        _this.innerHTML = `<input type='text' value='${_this.innerText}'>
+                            <button class="save">save</button>
+                            <button class="cancel">cancel</button>
+                            `;
+    }
+
+    function saveLogin(parrent){
+        let id = parrent.dataset.id;
+        let value = parrent.querySelector("input").value;
+        Ajax.post("/admin/users/editlogin",{
+            userid:id,
+            value:value
+        },function (response) {
+            parrent.innerText = value;
+        });
+
+
+    }
+
+
+
+    document.addEventListener("click",function(e){
+        if(!e.target.matches(".save")) return;
+        let _this = e.target;
+        let parrent = _this.closest(".editable");
+        if(parrent.dataset.name == 'login') saveLogin(parrent);
+
+        parrent.innerText = parrent.dataset.value
+    });
+    document.addEventListener("click",function(e){
+        if(!e.target.matches(".cancel")) return;
+        let _this = e.target;
+        let parrent = _this.closest(".editable");
+        parrent.innerText = parrent.dataset.value
+    });
+
+</script>
+
+<table class="table">
+{% for user in users %}
+    <tr>
+        <td>{{ user.id }}</td>
+        <td class="editable" data-name="login" data-id="{{ user.id }}">{{ user.login }}</td>
+        <td>
+            <ul>
+            {%  for role in user.roles().all()%}
+                <li>
+                    {{ role.name }}
+                    <form action="/admin/users/deleterole" method="post" style="display: inline-block;">
+                        <input type="hidden" value="{{ role.id }}" name="roleid">
+                        <input type="hidden" value="{{ user.id }}" name="userid">
+                        <input type="submit" value="delete">
+                    </form>
+                </li>
+            {% endfor %}
+            </ul>
+            <div class="addrole">
+                <form action="/admin/users/addrole" method="post">
+                    <select name="roleid">
+                        {% for r in roles %}
+                            <option value="{{ r.id }}">{{ r.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="hidden" value="{{ user.id }}" name="userid">
+                    <input type="submit" value="add">
+                </form>
+
+            </div>
+        </td>
+    </tr>
+{% endfor %}
+</table>

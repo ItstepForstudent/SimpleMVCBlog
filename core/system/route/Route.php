@@ -17,6 +17,16 @@ class Route
     protected $rule;
     protected $controller;
     protected $action;
+    protected $filter=null;
+
+    /**
+     * @param null $filter
+     */
+    public function setFilter(callable $filter)
+    {
+        $this->filter = $filter;
+        return $this;
+    }
 
 
     public function __construct(string $rule,string $controller,string $action){
@@ -34,6 +44,7 @@ class Route
     }
 
     public function compareRoute(){
+        if($this->filter!==null && !($this->filter)()) return false;
         return $this->getClearRule() === $this->getClearPath();
     }
 

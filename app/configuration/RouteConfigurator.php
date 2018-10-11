@@ -9,6 +9,8 @@
 namespace app\configuration;
 
 
+use app\models\User;
+use core\system\Auth;
 use core\system\exceptions\RouterException;
 use core\system\route\ParametricalRoute;
 use core\system\route\Route;
@@ -20,6 +22,12 @@ class RouteConfigurator
     public static function routerConfigure(){
         Router::instance()->addRoute(new Route("","main","index"));
 
+
+        $admin_filter = function (){
+            return Auth::instance()->isAuth() && Auth::instance()->getCurrentUser(User::class)->hasRole("admin");
+        };
+
+
         //auth routes
         Router::instance()->addRoute(new Route("register","auth","register"));
         Router::instance()->addRoute(new Route("login","auth","login"));
@@ -29,10 +37,16 @@ class RouteConfigurator
 
 
         //posts
-        Router::instance()->addRoute(new Route("posts/add","post","add"));
         Router::instance()->addRoute(new Route("posts/add/handle","post","add_handle"));
         Router::instance()->addRoute(new ParametricalRoute("posts/{id}","post","view"));
         Router::instance()->addRoute(new ParametricalRoute("posts/category/{catid}/{?page}","post","category"));
+
+        //admin
+        Router::instance()->addRoute((new Route("admin","admin","index"))->setFilter($admin_filter));
+        Router::instance()->addRoute((new Route("admin/users","admin","users"))->setFilter($admin_filter));
+        Router::instance()->addRoute((new Route("admin/users/addrole","admin","addrole"))->setFilter($admin_filter));
+        Router::instance()->addRoute((new Route("admin/users/deleterole","admin","delrole"))->setFilter($admin_filter));
+        Router::instance()->addRoute((new Route("admin/users/editlogin","admin","editlogin"))->setFilter($admin_filter));
 
         Router::instance()->addRoute(new Route("404","c404","index"));
     }

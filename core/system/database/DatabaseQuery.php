@@ -56,6 +56,10 @@ class DatabaseQuery
         return $this;
 
     }
+    public function dumpSelect(){
+        echo $this->buildSelect();
+        return $this;
+    }
 
 
     public function asc($field = "id")

@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        .nav{
+            list-style-type: none;
+            height: 50px;
+            background-color: #333;
+            display: flex;
+        }
+        .nav a{
+            line-height: 50px;
+            display: block;
+            color:white;
+            padding: 0 20px;
+        }
+    </style>
+</head>
+<body>
+    <ul class="nav">
+        <li><a href="/">Homepage</a></li>
+        <li><a href="/admin">Admin index</a></li>
+        <li><a href="/admin/users">Users</a></li>
+    </ul>
+    {{content|raw}}
+</body>
+</html>
